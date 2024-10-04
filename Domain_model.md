@@ -49,5 +49,13 @@ entity Register {
 User "0..1" -down-- "1" Account : Создать аккаунт
 User "0..1" -down-- "1" Guest : Зайти на сайт
 
+Account "0..1" -down-- "1" Property : Разместить объявление
+
+Property "0..1" -down-- "1" Payment : Оплатить аренду
+
+Property "0..1" -down-- "1" LeaseAgreement : Заключить договор
+
+Payment "0..1" -down-- "1" Register : Обработка платежа
+
 @enduml
 ```
