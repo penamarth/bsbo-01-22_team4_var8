@@ -41,5 +41,13 @@ entity LeaseAgreement {
     +terms: string
 }
 
+entity Register {
+    +registerID: int
+    +createdAt: date
+}
+
+User "0..1" -down-- "1" Account : Создать аккаунт
+User "0..1" -down-- "1" Guest : Зайти на сайт
+
 @enduml
 ```
