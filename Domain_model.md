@@ -14,6 +14,18 @@ entity User {
     +email: string
 }
 
+entity Guest {
+    +guestID: int
+    +sessionID: string
+}
+
+entity Property {
+    +propertyID: int
+    +address: string
+    +description: string
+    +price: float
+    +status: string
+}
 
 @enduml
 ```
