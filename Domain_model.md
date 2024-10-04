@@ -27,5 +27,19 @@ entity Property {
     +status: string
 }
 
+entity Payment {
+    +paymentID: int
+    +amount: float
+    +paymentDate: date
+    +paymentMethod: string
+}
+
+entity LeaseAgreement {
+    +agreementID: int
+    +startDate: date
+    +endDate: date
+    +terms: string
+}
+
 @enduml
 ```
