@@ -1,17 +1,15 @@
 ```plantuml
 @startuml
 
-<<<<<<< Updated upstream
 actor Квартиросъёмщик
 participant PropertySearch
 participant Property
 participant Favorites
 participant Booking
 participant NotificationModule
-=======
+
 actor "Квартиросъёмщик" as Tenant
 actor "Владелец" as Owner
->>>>>>> Stashed changes
 
 participant "Система жилищного агентства" as System
 participant "PropertySearch" as Search
@@ -46,14 +44,14 @@ activate System
 
 System -> Favorites : addProperty(propertyID, tenantID)
 activate Favorites
-<<<<<<< Updated upstream
+
 Favorites -> NotificationModule : notifyOwner(propertyID, "added to favorites")
 deactivate Favorites
 Квартиросъёмщик -> Booking : startBooking(propertyID)
 activate Booking
 Booking -> NotificationModule : notifyOwner(propertyID, "viewed property")
 deactivate Booking
-=======
+
 Favorites --> System : подтверждение добавления
 deactivate Favorites
 
@@ -130,7 +128,6 @@ alt Владелец отвечает на запрос
     System -> Tenant : получение ответа владельца
     deactivate System
 end
->>>>>>> Stashed changes
 
 @enduml
 ```
