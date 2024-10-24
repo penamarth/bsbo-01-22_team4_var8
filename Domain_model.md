@@ -1,61 +1,124 @@
 ```plantuml
 @startuml
-entity Account {
-    +ID: int
-    +username: string
-    +password: string
-    +email: string
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam classBackgroundColor LightYellow
+skinparam classBorderColor Black
+skinparam packageBackgroundColor LightBlue
+skinparam packageBorderColor Black
+
+class "User" {
+  +ID: UUID
+  +FirstName: String
+  +LastName: String
+  +Email: String
+  +Phone: String
+  +Password: String
 }
 
-entity User {
-    +userID: int
-    +name: string
-    +phone: string
-    +email: string
+class "Tenant" {
+  +RegistrationDate: Date
+  +BookingHistory: List<Booking>
+  +FavoriteListings: List<Listing>
 }
 
-entity Guest {
-    +guestID: int
-    +sessionID: string
+class "Owner" {
+  +RegistrationDate: Date
+  +PropertyList: List<Property>
 }
 
-entity Property {
-    +propertyID: int
-    +address: string
-    +description: string
-    +price: float
-    +status: string
+class "Administrator" {
+  +ID: UUID
+  +FirstName: String
+  +LastName: String
+  +Email: String
+  +Phone: String
 }
 
-entity Payment {
-    +paymentID: int
-    +amount: float
-    +paymentDate: date
-    +paymentMethod: string
+class "Property" {
+  +ID: UUID
+  +Address: String
+  +Description: String
+  +Price: Decimal
+  +NumberOfRooms: Integer
+  +Photos: List<String>
+  +Amenities: List<String>
+  +AvailabilityStatus: String
 }
 
-entity LeaseAgreement {
-    +agreementID: int
-    +startDate: date
-    +endDate: date
-    +terms: string
+class "Listing" {
+  +ID: UUID
+  +Description: String
+  +Price: Decimal
+  +Photos: List<String>
+  +RentalTerms: String
+  +PublicationDate: Date
+  +Status: String
 }
 
-entity Register {
-    +registerID: int
-    +createdAt: date
+class "Booking" {
+  +ID: UUID
+  +StartDate: Date
+  +EndDate: Date
+  +Status: String
+  +PaymentAmount: Decimal
 }
 
-User "0..1" -down-- "1" Account : Создать аккаунт
-User "0..1" -down-- "1" Guest : Зайти на сайт
+class "RentalAgreement" {
+  +ID: UUID
+  +SigningDate: Date
+  +RentalTerms: String
+  +Status: String
+}
 
-Account "0..1" -down-- "1" Property : Разместить объявление
+class "Payment" {
+  +ID: UUID
+  +PaymentDate: Date
+  +Amount: Decimal
+  +PaymentMethod: String
+  +Status: String
+}
 
-Property "0..1" -down-- "1" Payment : Оплатить аренду
+class "Notification" {
+  +ID: UUID
+  +MessageText: String
+  +SentDate: Date
+  +NotificationType: String
+}
 
-Property "0..1" -down-- "1" LeaseAgreement : Заключить договор
+class "Review" {
+  +ID: UUID
+  +Rating: Integer
+  +Comment: String
+  +Date: Date
+}
 
-Payment "0..1" -down-- "1" Register : Обработка платежа
+class "Message" {
+  +ID: UUID
+  +SenderID: UUID
+  +RecipientID: UUID
+  +MessageText: String
+  +SentDate: Date
+}
 
+"Tenant" --|> "User"
+"Owner" --|> "User"
+"Administrator" --|> "User"
+
+"Owner" "1" -- "*" "Property" : owns >
+"Property" "1" -- "1" "Listing" : associated with >
+"Tenant" "1" -- "*" "Booking" : makes >
+"Booking" "1" -- "1" "RentalAgreement" : forms >
+"RentalAgreement" "1" -- "1" "Payment" : includes >
+"Tenant" "*" -- "*" "Listing" : adds to favorites >
+"Owner" "*" -- "*" "Notification" : receives >
+"Tenant" "*" -- "*" "Notification" : receives >
+"Tenant" "*" -- "*" "Review" : leaves >
+"Owner" "*" -- "*" "Review" : receives >
+"Tenant" "*" -- "*" "Message" : sends >
+"Owner" "*" -- "*" "Message" : sends >
+"Administrator" "*" -- "*" "Notification" : manages >
+"Administrator" "*" -- "*" "Message" : manages >
 @enduml
 ```
