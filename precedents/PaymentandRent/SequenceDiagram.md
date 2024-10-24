@@ -1,3 +1,4 @@
+```plantuml
 @startuml
 
 actor "Квартиросъёмщик" as Tenant
@@ -56,3 +57,4 @@ end
 deactivate System
 
 @enduml
+```
