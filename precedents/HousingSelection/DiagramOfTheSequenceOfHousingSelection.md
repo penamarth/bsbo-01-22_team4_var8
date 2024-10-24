@@ -7,7 +7,7 @@ participant PropertySearch
 participant Property
 participant Favorites
 participant Booking
-participant NotificationSystem
+participant NotificationModule
 
 Квартиросъёмщик -> PropertySearch : enterSearchCriteria(location, price, rooms, etc.)
 activate PropertySearch
@@ -26,11 +26,11 @@ deactivate Property
 
 Квартиросъёмщик -> Favorites : addProperty(propertyID)
 activate Favorites
-Favorites -> NotificationSystem : notifyOwner(propertyID, "added to favorites")
+Favorites -> NotificationModule : notifyOwner(propertyID, "added to favorites")
 deactivate Favorites
 Квартиросъёмщик -> Booking : startBooking(propertyID)
 activate Booking
-Booking -> NotificationSystem : notifyOwner(propertyID, "viewed property")
+Booking -> NotificationModule : notifyOwner(propertyID, "viewed property")
 deactivate Booking
 
 @enduml
