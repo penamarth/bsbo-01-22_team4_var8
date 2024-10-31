@@ -1,5 +1,6 @@
-
+```plantuml
 @startuml
+
 actor "Квартиросъемщик" as Tenant
 actor "Владелец" as Owner
 actor "Администратор" as Administrator
@@ -23,7 +24,7 @@ alt Если аренда завершена
     DB -> System: confirmSave()
     deactivate DB
 
-    ==  Отправка на модерацию ==
+    == Отправка на модерацию ==
     System -> Administrator: sendForModeration(reviewId)
     activate Administrator
 
@@ -43,5 +44,6 @@ else Если аренда не завершена
 end
 
 deactivate System
-@enduml
 
+@enduml
+```
