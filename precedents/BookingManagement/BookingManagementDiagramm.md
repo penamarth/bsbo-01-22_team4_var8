@@ -1,3 +1,5 @@
+```plantuml
+
 @startuml
 actor Квартиросъёмщик
 actor Владелец
@@ -41,3 +43,5 @@ NotificationService -> Квартиросъёмщик: Уведомление
 NotificationService -> Владелец: Уведомление
 
 @enduml
+
+```
