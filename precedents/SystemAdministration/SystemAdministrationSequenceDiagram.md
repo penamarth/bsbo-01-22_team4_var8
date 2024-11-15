@@ -2,60 +2,54 @@
 @startuml
 
 actor "Администратор" as Administrator
-participant "Система жилищного агентства" as System
-participant "База данных" as DB
+participant "BookingSystem" as System
 
 == Доступ к модулю администрирования ==
-Administrator -> System: loginAdminInterface()
+Administrator -> System: loginToAdminInterface()
 activate System
-System -> DB: verifyAdminAccess(adminId)
-DB -> System: accessGranted()
-System -> Administrator: showAdminDashboard()
+System -> System: verifyAdminAccess(adminId)
+System -> Administrator: displayAdminDashboard()
 deactivate System
 
 == Управление пользователями ==
 Administrator -> System: manageUsers()
 activate System
-System -> DB: fetchUserList()
-DB -> System: userList()
+System -> System: fetchUserList()
 System -> Administrator: displayUsers()
 Administrator -> System: modifyUser(userId, newRole)
-System -> DB: updateUserRole(userId, newRole)
-DB -> System: confirmUpdate()
+System -> System: updateUserRole(userId, newRole)
+System -> Administrator: confirmUpdate()
 deactivate System
 
 == Модерация контента ==
 Administrator -> System: moderateContent()
 activate System
-System -> DB: fetchContentList()
-DB -> System: contentList()
+System -> System: fetchContentList()
 System -> Administrator: displayContent()
 Administrator -> System: reviewContent(contentId)
-System -> DB: updateContentStatus(contentId, status, comments)
-DB -> System: confirmContentUpdate()
+System -> System: updateContentStatus(contentId, status, comments)
+System -> Administrator: confirmContentUpdate()
 System -> Administrator: notifyContentAuthor(contentId)
 deactivate System
 
 == Управление безопасностью ==
 Administrator -> System: accessSecuritySettings()
 activate System
-System -> DB: retrieveLogs()
-DB -> System: logData()
+System -> System: retrieveLogs()
 System -> Administrator: displayLogs()
 Administrator -> System: updateSecuritySettings(securityParams)
-System -> DB: updateSecurity(securityParams)
-DB -> System: confirmSecurityUpdate()
+System -> System: updateSecurity(securityParams)
+System -> Administrator: confirmSecurityUpdate()
 deactivate System
 
 == Управление системными настройками ==
 Administrator -> System: accessSystemSettings()
 activate System
-System -> DB: fetchSettings()
-DB -> System: systemSettings()
+System -> System: fetchSettings()
 System -> Administrator: displaySettings()
 Administrator -> System: modifySettings(newSettings)
-System -> DB: updateSettings(newSettings)
-DB -> System: confirmSettingsUpdate()
+System -> System: updateSettings(newSettings)
+System -> Administrator: confirmSettingsUpdate()
 System -> Administrator: notifySettingsUpdated()
 deactivate System
 
