@@ -11,7 +11,7 @@ participant NotificationModule
 actor "Квартиросъёмщик" as Tenant
 actor "Владелец" as Owner
 
-participant "Система жилищного агентства" as System
+participant "BookingSystem" as System
 participant "PropertySearch" as Search
 participant "PropertyDetails" as Details
 participant "FavoritesModule" as Favorites
@@ -24,20 +24,20 @@ activate System
 
 System -> Search : filterResults(location, priceRange, roomCount, amenities)
 activate Search
-Search --> System : список доступных объектов
+Search --> System : list of available properties
 deactivate Search
 
-System -> Tenant : отображение результатов поиска
+System -> Tenant : display search results
 
 Tenant -> System : viewPropertyDetails(propertyID)
 activate System
 
 System -> Details : getDetails(propertyID)
 activate Details
-Details --> System : подробная информация о жилье
+Details --> System : detailed property information
 deactivate Details
 
-System -> Tenant : отображение деталей жилья
+System -> Tenant : display property details
 
 Tenant -> System : addToFavorites(propertyID)
 activate System
@@ -47,19 +47,19 @@ activate Favorites
 
 Favorites -> NotificationModule : notifyOwner(propertyID, "added to favorites")
 deactivate Favorites
-Квартиросъёмщик -> Booking : startBooking(propertyID)
+Tenant -> Booking : startBooking(propertyID)
 activate Booking
 Booking -> NotificationModule : notifyOwner(propertyID, "viewed property")
 deactivate Booking
 
-Favorites --> System : подтверждение добавления
+Favorites --> System : confirmation of addition
 deactivate Favorites
 
-System -> Tenant : подтверждение сохранения в избранное
+System -> Tenant : confirmation of saving to favorites
 
-System -> Owner : notifyOwner(ownerID, "Ваше объявление было добавлено в избранное")
+System -> Owner : notifyOwner(ownerID, "Your listing has been added to favorites")
 activate Owner
-Owner <-- System : получение уведомления
+Owner <-- System : receive notification
 deactivate Owner
 
 deactivate System
@@ -72,25 +72,25 @@ alt Квартиросъёмщик не нашёл подходящего жил
 
     System -> Search : filterResults(location, priceRange, roomCount, amenities)
     activate Search
-    Search --> System : пустой список
+    Search --> System : empty list
     deactivate Search
 
-    System -> Tenant : сообщение "Жилье не найдено"
+    System -> Tenant : message "Property not found"
     
-    Tenant -> System : предложить изменить критерии поиска
+    Tenant -> System : suggestChangingSearchCriteria()
     activate System
 
-    System -> Tenant : запросить новые критерии поиска
+    System -> Tenant : request new search criteria
 
     Tenant -> System : searchProperties(newLocation, newPriceRange, newRoomCount, newAmenities)
     activate System
 
     System -> Search : filterResults(newLocation, newPriceRange, newRoomCount, newAmenities)
     activate Search
-    Search --> System : обновлённый список объектов
+    Search --> System : updated list of properties
     deactivate Search
 
-    System -> Tenant : отображение обновлённых результатов поиска
+    System -> Tenant : display updated search results
     deactivate System
 end
 
@@ -102,15 +102,15 @@ alt Квартиросъёмщик хочет запросить дополни�
 
     System -> Messaging : sendMessage(propertyID, tenantID, message)
     activate Messaging
-    Messaging --> System : подтверждение отправки
+    Messaging --> System : confirmation of sending
     deactivate Messaging
 
-    System -> Owner : notifyOwner(ownerID, "Получено сообщение от квартиросъёмщика")
+    System -> Owner : notifyOwner(ownerID, "Message received from tenant")
     activate Owner
-    Owner <-- System : получение уведомления
+    Owner <-- System : receive notification
     deactivate Owner
 
-    System -> Tenant : подтверждение отправки сообщения
+    System -> Tenant : confirmation of message sent
     deactivate System
 end
 
@@ -122,10 +122,10 @@ alt Владелец отвечает на запрос
 
     System -> Messaging : sendMessageResponse(propertyID, tenantID, response)
     activate Messaging
-    Messaging --> System : подтверждение отправки
+    Messaging --> System : confirmation of sending
     deactivate Messaging
 
-    System -> Tenant : получение ответа владельца
+    System -> Tenant : receive owner's response
     deactivate System
 end
 
