@@ -4,7 +4,7 @@
 actor "Квартиросъёмщик" as Tenant
 actor "Владелец" as Owner
 
-participant "Система жилищного агентства" as System
+participant "BookingSystem" as System
 participant "RentalAgreement" as Agreement
 participant "PaymentModule" as Payment
 participant "LegalRegistry" as LegalRegistry
@@ -12,7 +12,7 @@ participant "NotificationModule" as Notifier
 
 == Основной Успешный Сценарий ==
 
-Tenant -> System : Подтвердить условия аренды(rentalID, terms)
+Tenant -> System : confirmRentalTerms(rentalID, terms)
 activate System
 
 System -> Agreement : confirmTerms(rentalID, terms)
@@ -44,13 +44,13 @@ alt Платёж успешен
 
     System -> Notifier : sendNotification([Tenant, Owner], message)
     activate Notifier
-    Notifier --> Tenant : Уведомление об успешной аренде
-    Notifier --> Owner : Уведомление о заключении договора
+    Notifier --> Tenant : Notification of successful rental
+    Notifier --> Owner : Notification of the conclusion of the contract
     deactivate Notifier
 else Платёж не успешен
     System -> Notifier : sendNotification(Tenant, paymentFailureMessage)
     activate Notifier
-    Notifier --> Tenant : Уведомление о неудачной оплате
+    Notifier --> Tenant : Notification of a failed payment
     deactivate Notifier
 end
 
