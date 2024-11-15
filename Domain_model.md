@@ -12,12 +12,21 @@ class "BookingSystem" {
   +Users: List<User>
   +Bookings: List<Booking>
   +Properties: List<Property>
+  +NotificationModule: NotificationModule
+  +addUser(userID: UUID)
+  +getUserByID(userID: UUID): User
+  +addBooking(bookingID: UUID)
+  +getBookingByID(bookingID: UUID): Booking
+  +addProperty(propertyID: UUID)
+  +getPropertyByID(propertyID: UUID): Property
+}
+
+class "NotificationModule" {
   +Notifications: List<Notification>
   +Messages: List<Message>
-  +addUser(user: User)
-  +addBooking(booking: Booking)
-  +addProperty(property: Property)
   +sendNotification(notification: Notification)
+  +sendMessage(message: Message)
+  +getMessageHistory(userID: UUID): List<Message>
 }
 
 class "User" {
@@ -112,8 +121,10 @@ class "Message" {
 "BookingSystem" o-- "User" : manages >
 "BookingSystem" o-- "Booking" : manages >
 "BookingSystem" o-- "Property" : manages >
-"BookingSystem" o-- "Notification" : manages >
-"BookingSystem" o-- "Message" : manages >
+"BookingSystem" o-- "NotificationModule" : uses >
+
+"NotificationModule" o-- "Notification" : manages >
+"NotificationModule" o-- "Message" : manages >
 
 "Tenant" --|> "User"
 "Owner" --|> "User"
