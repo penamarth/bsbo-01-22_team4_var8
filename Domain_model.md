@@ -8,6 +8,18 @@ skinparam classBorderColor Black
 skinparam packageBackgroundColor LightBlue
 skinparam packageBorderColor Black
 
+class "BookingSystem" {
+  +Users: List<User>
+  +Bookings: List<Booking>
+  +Properties: List<Property>
+  +Notifications: List<Notification>
+  +Messages: List<Message>
+  +addUser(user: User)
+  +addBooking(booking: Booking)
+  +addProperty(property: Property)
+  +sendNotification(notification: Notification)
+}
+
 class "User" {
   +ID: UUID
   +FirstName: String
@@ -63,13 +75,8 @@ class "Booking" {
   +EndDate: Date
   +Status: String
   +PaymentAmount: Decimal
-}
-
-class "RentalAgreement" {
-  +ID: UUID
-  +SigningDate: Date
-  +RentalTerms: String
-  +Status: String
+  +Payment: Payment
+  +formRentalAgreement()
 }
 
 class "Payment" {
@@ -102,6 +109,12 @@ class "Message" {
   +SentDate: Date
 }
 
+"BookingSystem" o-- "User" : manages >
+"BookingSystem" o-- "Booking" : manages >
+"BookingSystem" o-- "Property" : manages >
+"BookingSystem" o-- "Notification" : manages >
+"BookingSystem" o-- "Message" : manages >
+
 "Tenant" --|> "User"
 "Owner" --|> "User"
 "Administrator" --|> "User"
@@ -109,8 +122,7 @@ class "Message" {
 "Owner" "1" -- "*" "Property" : owns >
 "Property" "1" -- "1" "Listing" : associated with >
 "Tenant" "1" -- "*" "Booking" : makes >
-"Booking" "1" -- "1" "RentalAgreement" : forms >
-"RentalAgreement" "1" -- "1" "Payment" : includes >
+"Booking" "1" -- "1" "Payment" : includes >
 "Tenant" "*" -- "*" "Listing" : adds to favorites >
 "Owner" "*" -- "*" "Notification" : receives >
 "Tenant" "*" -- "*" "Notification" : receives >
