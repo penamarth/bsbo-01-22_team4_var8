@@ -4,153 +4,153 @@
 actor "Пользователь" as User
 actor "Администратор" as Admin
 
-participant "Система жилищного агентства" as System
-participant "UserAccount" as Account
-participant "PaymentModule" as Payment
-participant "NotificationModule" as Notifier
+participant "BookingSystem" as System
+participant "User" as Account
+participant "Payment" as Payment
+participant "Notification" as Notifier
 
 == Основной Успешный Сценарий ==
 
-User -> System : Открыть настройки учетной записи
+User -> System : Open account settings
 activate System
 
 System -> Account : loadData(userID)
 activate Account
-Account --> System : данные учетной записи
+Account --> System : account data
 deactivate Account
 
-System --> User : отображение данных учетной записи
+System --> User : display account data
 
-User -> System : Изменить контактные данные
+User -> System : Change contact information
 System -> Account : validateData(data)
 activate Account
-Account --> System : результат проверки
+Account --> System : validation result
 deactivate Account
 
 alt Данные корректны
     System -> Account : saveChanges(userID, data)
     activate Account
-    Account --> System : подтверждение сохранения
+    Account --> System : confirmation of save
     deactivate Account
 
     System -> Notifier : notifyUser(userID, message)
     activate Notifier
-    Notifier --> User : Уведомление об изменении данных
+    Notifier --> User : Notification of data change
     deactivate Notifier
 else Некорректные данные
     System -> Account : showErrors(data)
     activate Account
-    Account --> System : ошибки в данных
+    Account --> System : data errors
     deactivate Account
 
-    System --> User : Сообщение об ошибках в данных
+    System --> User : Message about data errors
 end
 
-User -> System : Изменить платежные данные
+User -> System : Change payment information
 System -> Payment : updateDetails(userID, paymentInfo)
 activate Payment
-Payment --> System : Подтверждение обновления
+Payment --> System : Update confirmation
 deactivate Payment
 
 System -> Notifier : notifyUser(userID, message)
 activate Notifier
-Notifier --> User : Уведомление об изменении платежной информации
+Notifier --> User : Notification of payment information change
 deactivate Notifier
 
-User -> System : Удалить учетную запись
+User -> System : Delete account
 System -> Account : confirmDeletion(userID)
 activate Account
-Account --> System : подтверждение удаления
+Account --> System : deletion confirmation
 deactivate Account
 
 alt Подтверждено
     System -> Account : delete(userID)
     activate Account
-    Account --> System : Учетная запись удалена
+    Account --> System : Account deleted
     deactivate Account
 
     System -> Notifier : notifyUser(userID, deleteConfirmationMessage)
     activate Notifier
-    Notifier --> User : Уведомление об удалении учетной записи
+    Notifier --> User : Account deletion notification
     deactivate Notifier
 else Не подтверждено
-    System --> User : отмена удаления учетной записи
+    System --> User : account deletion cancelled
 end
 
 == Альтернативный Поток: *2.1 Пользователь указывает некорректные данные ==
 
-User -> System : Ввести данные с ошибками
+User -> System : Enter data with errors
 System -> Account : validateData(data)
 activate Account
-Account --> System : ошибка валидации
+Account --> System : validation error
 deactivate Account
 
 System -> Account : showErrors(data)
 activate Account
-Account --> System : ошибки
+Account --> System : errors
 deactivate Account
 
-System --> User : Сообщение об ошибках в данных
+System --> User : Message about data errors
 
 == Альтернативный Поток: *3.1 Пользователь запрашивает удаление платежных данных без замены ==
 
-User -> System : Удалить платежные данные
+User -> System : Delete payment information
 System -> Payment : requireUpdate()
 activate Payment
-Payment --> System : Уведомление о необходимости новых данных
+Payment --> System : Notification of need for new data
 deactivate Payment
 
-System --> User : Сообщение о необходимости указать новые платежные данные
+System --> User : Message about needing to provide new payment information
 
 == Альтернативный Поток: *4.1 Пользователь хочет восстановить учетную запись ==
 
-User -> System : Войти после удаления учетной записи
+User -> System : Log in after account deletion
 System -> Account : showDeletedMessage()
 activate Account
-Account --> System : Учетная запись удалена
+Account --> System : Account deleted
 deactivate Account
 
-System --> User : Уведомление о невозможности восстановления
+System --> User : Notification of inability to restore account
 
 == Альтернативный Поток: *5.1 Ошибка при сохранении данных ==
 
-User -> System : Изменить личные данные
+User -> System : Change personal data
 System -> Account : saveChanges(userID, data)
 activate Account
-Account --> System : Ошибка сохранения данных
+Account --> System : Data saving error
 deactivate Account
 
 System -> Notifier : notifyError(userID, errorDetails)
 activate Notifier
-Notifier --> User : Уведомление об ошибке с рекомендацией
+Notifier --> User : Error notification with recommendation
 deactivate Notifier
 
 == Расширение: *а. Периодическая проверка активности учетной записи ==
 
 System -> Admin : checkInactivity()
 activate Admin
-Admin --> System : отчет о неактивных учетных записях
+Admin --> System : Report on inactive accounts
 deactivate Admin
 
 System -> User : remindInactivity(userID)
 activate Notifier
-Notifier --> User : Уведомление о длительной неактивности
+Notifier --> User : Notification of prolonged inactivity
 deactivate Notifier
 
 == Расширение: *б. Восстановление доступа к учетной записи после сбоя ==
 
-User -> System : Сообщить о сбое
+User -> System : Report failure
 System -> Admin : restart()
 activate Admin
-Admin --> System : Восстановление системы
+Admin --> System : System restoration
 deactivate Admin
 
 System -> Account : restoreSession(userID)
 activate Account
-Account --> System : сессия восстановлена
+Account --> System : session restored
 deactivate Account
 
-System --> User : Возвращение к последнему действию
+System --> User : Return to last action
 
 @enduml
 ```
