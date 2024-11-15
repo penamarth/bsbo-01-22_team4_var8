@@ -3,44 +3,44 @@
 @startuml
 actor Квартиросъёмщик
 actor Владелец
-participant "Система" as System
-participant "Бронирование" as Booking
-participant "Сервис уведомлений" as NotificationService
+participant "BookingSystem" as System
+participant "Booking" as Booking
+participant "Notification" as NotificationService
 
 == Просмотр текущего бронирования ==
-Квартиросъёмщик -> System: Переход в управление бронированием
+Квартиросъёмщик -> System: Navigate to booking management
 System -> Booking: getBookingStatus(bookingID)
-Booking -> System: Статус бронирования
-System -> Квартиросъёмщик: Отображение статуса бронирования
+Booking -> System: Booking status
+System -> Квартиросъёмщик: Display booking status
 
 == Изменение или отмена бронирования ==
-Квартиросъёмщик -> System: Изменение/отмена бронирования
+Квартиросъёмщик -> System: Modify/cancel booking
 System -> Booking: modifyBooking(bookingID, data)
-Booking -> System: Подтверждение изменений
-System -> Владелец: Уведомление об изменениях (notifyUsers)
+Booking -> System: Confirmation of changes
+System -> Владелец: Notification of changes (notifyUsers)
 
 == Подтверждение бронирования владельцем ==
-Владелец -> System: Подтверждение бронирования
+Владелец -> System: Confirm booking
 System -> Booking: confirmBooking(bookingID)
-Booking -> System: Подтверждение
-System -> Квартиросъёмщик: Уведомление о подтверждении (notifyUsers)
+Booking -> System: Confirmation
+System -> Квартиросъёмщик: Confirmation notification (notifyUsers)
 
 == Отклонение бронирования владельцем ==
-Владелец -> System: Отклонение бронирования
+Владелец -> System: Reject booking
 System -> Booking: rejectBooking(bookingID, reason)
-Booking -> System: Подтверждение
-System -> Квартиросъёмщик: Уведомление об отказе (notifyUsers)
+Booking -> System: Confirmation
+System -> Квартиросъёмщик: Rejection notification (notifyUsers)
 
 == Продление бронирования ==
-Квартиросъёмщик -> System: Запрос продления
+Квартиросъёмщик -> System: Request extension
 System -> Booking: extendBooking(bookingID, duration)
-Booking -> System: Подтверждение продления
-System -> Владелец: Уведомление о продлении (notifyUsers)
+Booking -> System: Extension confirmation
+System -> Владелец: Extension notification (notifyUsers)
 
 == Уведомление участников ==
 System -> NotificationService: notifyUsers(bookingID, message)
-NotificationService -> Квартиросъёмщик: Уведомление
-NotificationService -> Владелец: Уведомление
+NotificationService -> Квартиросъёмщик: Notification
+NotificationService -> Владелец: Notification
 
 @enduml
 
