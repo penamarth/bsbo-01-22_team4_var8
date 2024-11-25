@@ -8,6 +8,16 @@ skinparam classBorderColor Black
 skinparam packageBackgroundColor LightBlue
 skinparam packageBorderColor Black
 
+interface Observer {
+  +update(notification: Notification)
+}
+
+interface Notifier {
+  +subscribe(observer: Observer)
+  +unsubscribe(observer: Observer)
+  +notifyObservers(notification: Notification)
+}
+
 class "BookingSystem" {
   +Users: List<User>
   +Bookings: List<Booking>
@@ -24,9 +34,13 @@ class "BookingSystem" {
 class "NotificationModule" {
   +Notifications: List<Notification>
   +Messages: List<Message>
+  +Observers: List<Observer>
   +sendNotification(notification: Notification)
   +sendMessage(message: Message)
   +getMessageHistory(userID: UUID): List<Message>
+  +subscribe(observer: Observer)
+  +unsubscribe(observer: Observer)
+  +notifyObservers(notification: Notification)
 }
 
 class "User" {
@@ -125,7 +139,9 @@ class "Message" {
 
 "NotificationModule" o-- "Notification" : manages >
 "NotificationModule" o-- "Message" : manages >
+"NotificationModule" ..|> "Notifier"
 
+"User" ..|> "Observer"
 "Tenant" --|> "User"
 "Owner" --|> "User"
 "Administrator" --|> "User"
