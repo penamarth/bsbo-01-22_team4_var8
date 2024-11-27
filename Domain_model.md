@@ -8,62 +8,102 @@ skinparam classBorderColor Black
 skinparam packageBackgroundColor LightBlue
 skinparam packageBorderColor Black
 
+' --- Интерфейсы ---
 interface Observer {
-  +update(notification: Notification)
+  +update(notification: Notification): void
 }
 
 interface Notifier {
-  +subscribe(observer: Observer)
-  +unsubscribe(observer: Observer)
-  +notifyObservers(notification: Notification)
+  +subscribe(observer: Observer): void
+  +unsubscribe(observer: Observer): void
+  +notifyObservers(notification: Notification): void
 }
 
-class "BookingSystem" {
-  +Users: List<User>
-  +Bookings: List<Booking>
-  +Properties: List<Property>
-  +NotificationModule: NotificationModule
-  +addUser(userID: UUID)
+interface IUserManager {
+  +addUser(user: User): UUID
   +getUserByID(userID: UUID): User
-  +addBooking(bookingID: UUID)
-  +getBookingByID(bookingID: UUID): Booking
-  +addProperty(propertyID: UUID)
-  +getPropertyByID(propertyID: UUID): Property
+  +getAllUsers(): List<User>
 }
 
-class "NotificationModule" {
+interface IBookingManager {
+  +createBooking(booking: Booking): UUID
+  +getBookingByID(bookingID: UUID): Booking
+  +getBookingsByUser(userID: UUID): List<Booking>
+}
+
+interface IPropertyManager {
+  +addProperty(property: Property): UUID
+  +getPropertyByID(propertyID: UUID): Property
+  +getPropertiesByOwner(ownerID: UUID): List<Property>
+}
+
+' --- Фасад ---
+class BookingSystemFacade {
+  +UserManager: IUserManager
+  +BookingManager: IBookingManager
+  +PropertyManager: IPropertyManager
+  +NotificationModule: NotificationModule
+  +registerUser(data: User): UUID
+  +createBooking(data: Booking): UUID
+  +sendNotification(data: Notification): void
+  +validateUserData(data: User): Boolean
+}
+
+' --- Модули системы ---
+class UserManager implements IUserManager {
+  +Users: List<User>
+  +addUser(user: User): UUID
+  +getUserByID(userID: UUID): User
+  +getAllUsers(): List<User>
+}
+
+class BookingManager implements IBookingManager {
+  +Bookings: List<Booking>
+  +createBooking(booking: Booking): UUID
+  +getBookingByID(bookingID: UUID): Booking
+  +getBookingsByUser(userID: UUID): List<Booking>
+}
+
+class PropertyManager implements IPropertyManager {
+  +Properties: List<Property>
+  +addProperty(property: Property): UUID
+  +getPropertyByID(propertyID: UUID): Property
+  +getPropertiesByOwner(ownerID: UUID): List<Property>
+}
+
+class NotificationModule implements Notifier {
+  +Observers: List<Observer>
   +Notifications: List<Notification>
   +Messages: List<Message>
-  +Observers: List<Observer>
-  +sendNotification(notification: Notification)
-  +sendMessage(message: Message)
-  +getMessageHistory(userID: UUID): List<Message>
-  +subscribe(observer: Observer)
-  +unsubscribe(observer: Observer)
-  +notifyObservers(notification: Notification)
+  +sendNotification(notification: Notification): void
+  +subscribe(observer: Observer): void
+  +unsubscribe(observer: Observer): void
+  +notifyObservers(notification: Notification): void
 }
 
-class "User" {
+' --- Пользователи ---
+class User implements Observer {
   +ID: UUID
   +FirstName: String
   +LastName: String
   +Email: String
   +Phone: String
   +Password: String
+  +update(notification: Notification): void
 }
 
-class "Tenant" {
+class Tenant {
   +RegistrationDate: Date
   +BookingHistory: List<Booking>
   +FavoriteListings: List<Listing>
 }
 
-class "Owner" {
+class Owner {
   +RegistrationDate: Date
   +PropertyList: List<Property>
 }
 
-class "Administrator" {
+class Administrator {
   +ID: UUID
   +FirstName: String
   +LastName: String
@@ -71,7 +111,8 @@ class "Administrator" {
   +Phone: String
 }
 
-class "Property" {
+' --- Связанные классы ---
+class Property {
   +ID: UUID
   +Address: String
   +Description: String
@@ -82,7 +123,7 @@ class "Property" {
   +AvailabilityStatus: String
 }
 
-class "Listing" {
+class Listing {
   +ID: UUID
   +Description: String
   +Price: Decimal
@@ -92,17 +133,17 @@ class "Listing" {
   +Status: String
 }
 
-class "Booking" {
+class Booking {
   +ID: UUID
   +StartDate: Date
   +EndDate: Date
   +Status: String
   +PaymentAmount: Decimal
   +Payment: Payment
-  +formRentalAgreement()
+  +formRentalAgreement(): Agreement
 }
 
-class "Payment" {
+class Payment {
   +ID: UUID
   +PaymentDate: Date
   +Amount: Decimal
@@ -110,21 +151,21 @@ class "Payment" {
   +Status: String
 }
 
-class "Notification" {
+class Notification {
   +ID: UUID
   +MessageText: String
   +SentDate: Date
   +NotificationType: String
 }
 
-class "Review" {
+class Review {
   +ID: UUID
   +Rating: Integer
   +Comment: String
   +Date: Date
 }
 
-class "Message" {
+class Message {
   +ID: UUID
   +SenderID: UUID
   +RecipientID: UUID
@@ -132,32 +173,35 @@ class "Message" {
   +SentDate: Date
 }
 
-"BookingSystem" o-- "User" : manages >
-"BookingSystem" o-- "Booking" : manages >
-"BookingSystem" o-- "Property" : manages >
-"BookingSystem" o-- "NotificationModule" : uses >
+' --- Связи ---
+BookingSystemFacade o-- IUserManager
+BookingSystemFacade o-- IBookingManager
+BookingSystemFacade o-- IPropertyManager
+BookingSystemFacade o-- NotificationModule
 
-"NotificationModule" o-- "Notification" : manages >
-"NotificationModule" o-- "Message" : manages >
-"NotificationModule" ..|> "Notifier"
+UserManager o-- User : manages >
+BookingManager o-- Booking : manages >
+PropertyManager o-- Property : manages >
+NotificationModule o-- Notification : manages >
+NotificationModule o-- Message : manages >
 
-"User" ..|> "Observer"
-"Tenant" --|> "User"
-"Owner" --|> "User"
-"Administrator" --|> "User"
+User ..|> Observer
+Tenant --|> User
+Owner --|> User
+Administrator --|> User
 
-"Owner" "1" -- "*" "Property" : owns >
-"Property" "1" -- "1" "Listing" : associated with >
-"Tenant" "1" -- "*" "Booking" : makes >
-"Booking" "1" -- "1" "Payment" : includes >
-"Tenant" "*" -- "*" "Listing" : adds to favorites >
-"Owner" "*" -- "*" "Notification" : receives >
-"Tenant" "*" -- "*" "Notification" : receives >
-"Tenant" "*" -- "*" "Review" : leaves >
-"Owner" "*" -- "*" "Review" : receives >
-"Tenant" "*" -- "*" "Message" : sends >
-"Owner" "*" -- "*" "Message" : sends >
-"Administrator" "*" -- "*" "Notification" : manages >
-"Administrator" "*" -- "*" "Message" : manages >
+Owner "1" -- "*" Property : owns >
+Property "1" -- "1" Listing : associated with >
+Tenant "1" -- "*" Booking : makes >
+Booking "1" -- "1" Payment : includes >
+Tenant "*" -- "*" Listing : adds to favorites >
+Owner "*" -- "*" Notification : receives >
+Tenant "*" -- "*" Notification : receives >
+Tenant "*" -- "*" Review : leaves >
+Owner "*" -- "*" Review : receives >
+Tenant "*" -- "*" Message : sends >
+Owner "*" -- "*" Message : sends >
+Administrator "*" -- "*" Notification : manages >
+Administrator "*" -- "*" Message : manages >
 @enduml
 ```
