@@ -7,24 +7,16 @@ class Tenant(
     firstName: String,
     lastName: String,
     email: String,
-    phone: String,
-    password: String,
-    val registrationDate: Date,
-    val bookingHistory: MutableList<Booking> = mutableListOf(),
-    val favoriteListings: MutableList<Listing> = mutableListOf()
-) : User(id, firstName, lastName, email, phone, password) {
+    phone: String
+) : User(id, firstName, lastName, email, phone) {
+    val favoriteListings = mutableListOf<Listing>()
 
-    fun addFavoriteListing(listing: Listing) {
+    fun addToFavorites(listing: Listing) {
         favoriteListings.add(listing)
-        println("Listing ${listing.id} added to favorites for tenant $firstName $lastName.")
     }
 
-    fun addBookingToHistory(booking: Booking) {
-        bookingHistory.add(booking)
-        println("Booking ${booking.id} added to history for tenant $firstName $lastName.")
-    }
-
-    override fun update(notification: Notification) {
-        println("Tenant $firstName $lastName received notification: ${notification.messageText}")
+    fun leaveReview(review: Review) {
+        println("Отзыв оставлен: ${review.comment}")
     }
 }
+
