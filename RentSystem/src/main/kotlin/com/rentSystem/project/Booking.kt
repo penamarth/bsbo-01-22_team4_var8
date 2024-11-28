@@ -2,45 +2,40 @@ package com.rentSystem.project
 
 import java.util.*
 
-import java.util.*
-
 data class Booking(
     val id: UUID,
+    val startDate: Date,
+    val endDate: Date,
+    var status: String,
+    val paymentAmount: Double,
     val tenantID: UUID,
-    val propertyID: UUID,
-    var startDate: Date,
-    var endDate: Date,
-    var status: String = "Pending", // По умолчанию статус "Ожидание"
-    var paymentAmount: Double,
-    var payment: Payment? = null // Может быть `null`, пока оплата не произведена
+    val ownerID: UUID,
+    val property: Property,
 ) {
-
-    fun updateDates(newStartDate: Date, newEndDate: Date) {
-        startDate = newStartDate
-        endDate = newEndDate
-        println("Booking $id: Dates updated to start=$newStartDate, end=$newEndDate.")
-    }
-
-    fun updateStatus(newStatus: String) {
-        status = newStatus
-        println("Booking $id: Status updated to '$newStatus'.")
-    }
-
-    fun addPayment(payment: Payment) {
-        this.payment = payment
-        println("Booking $id: Payment added with ID ${payment.id} and amount $${payment.amount}.")
-    }
-
-    fun displayDetails() {
-        println("Booking Details:")
-        println("ID: $id")
-        println("Tenant ID: $tenantID")
-        println("Property ID: $propertyID")
-        println("Start Date: $startDate")
-        println("End Date: $endDate")
-        println("Status: $status")
-        println("Payment Amount: $paymentAmount")
-        println("Payment Info: ${payment?.let { "Paid on ${it.paymentDate} with method ${it.paymentMethod}, status: ${it.status}" } ?: "No payment yet."}")
+    // Метод для формирования соглашения аренды
+    fun formRentalAgreement(): RentalAgreement {
+        return RentalAgreement(
+            id = UUID.randomUUID(),
+            bookingID = id,
+            tenantID = tenantID,
+            ownerID = ownerID,
+            propertyAddress = property.address,
+            rentalPeriod = "${startDate} - ${endDate}",
+            rentalAmount = paymentAmount,
+            agreementDate = Date()
+        ).also {
+            println("Соглашение аренды сформировано: ${it.id}")
+        }
     }
 }
 
+data class RentalAgreement(
+    val id: UUID,
+    val bookingID: UUID,
+    val tenantID: UUID,
+    val ownerID: UUID,
+    val propertyAddress: String,
+    val rentalPeriod: String,
+    val rentalAmount: Double,
+    val agreementDate: Date
+)
