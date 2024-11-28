@@ -1,15 +1,15 @@
 ```plantuml
 @startuml
 
-actor "User" as User
-actor "Administrator" as Admin
+actor "Пользователь" as User
+actor "Администратор" as Admin
 
 participant "BookingSystem" as System
 participant "UserManager" as UserManager
 participant "Payment" as Payment
 participant "NotificationModule" as Notifier
 
-== Main Successful Scenario ==
+== Основной успешный сценарий ==
 
 User -> System : Open account settings
 activate System
@@ -22,11 +22,11 @@ deactivate UserManager
 System --> User : Display account data
 
 User -> System : Change contact information
-System -> UserManager : validateData(data) <<Manual Validation>> 
+System -> UserManager : validateData(data)
 alt Data is valid
     System -> UserManager : addUser(userID, data)
     activate UserManager
-    UserManager --> System : Success confirmation
+    UserManager --> System : Save confirmation
     deactivate UserManager
 
     System -> Notifier : notifyObservers(notification)
@@ -51,13 +51,13 @@ deactivate Notifier
 User -> System : Delete account
 System -> UserManager : getUserByID(userID)
 activate UserManager
-UserManager --> System : User data for deletion confirmation
+UserManager --> System : Deletion confirmation
 deactivate UserManager
 
 alt Confirmed
     System -> UserManager : deleteUser(userID)
     activate UserManager
-    UserManager --> System : Account deleted confirmation
+    UserManager --> System : Account deleted
     deactivate UserManager
 
     System -> Notifier : notifyObservers(notification)
@@ -68,15 +68,15 @@ else Not confirmed
     System --> User : Account deletion cancelled
 end
 
-== Alternative Flow: *2.1 User enters invalid data ==
+== Альтернативный поток: *2.1 Пользователь вводит некорректные данные ==
 
 User -> System : Enter data with errors
 System -> UserManager : validateData(data)
-alt Validation fails
+alt Validation error
     System --> User : Message about data errors
 end
 
-== Alternative Flow: *3.1 User requests deletion of payment data without replacement ==
+== Альтернативный поток: *3.1 Пользователь запрашивает удаление платежных данных без замены ==
 
 User -> System : Delete payment information
 System -> Payment : requireUpdate()
@@ -86,23 +86,23 @@ deactivate Payment
 
 System --> User : Message about needing to provide new payment information
 
-== Alternative Flow: *4.1 User tries to restore a deleted account ==
+== Альтернативный поток: *4.1 Пользователь пытается восстановить удаленный аккаунт ==
 
 User -> System : Log in after account deletion
 System -> UserManager : getUserByID(userID)
 activate UserManager
-UserManager --> System : Account is deleted message
+UserManager --> System : Account deleted message
 deactivate UserManager
 
 System --> User : Notification of inability to restore account
 
-== Alternative Flow: *5.1 Error during data saving ==
+== Альтернативный поток: *5.1 Ошибка при сохранении данных ==
 
 User -> System : Change personal data
 System -> UserManager : addUser(userID, data)
 activate UserManager
-alt Error occurs
-    UserManager --> System : Error saving data
+alt Data saving error
+    UserManager --> System : Error while saving data
     deactivate UserManager
 
     System -> Notifier : notifyObservers(errorNotification)
@@ -110,11 +110,11 @@ alt Error occurs
     Notifier --> User : Error notification with recommendation
     deactivate Notifier
 else Data saved successfully
-    UserManager --> System : Success confirmation
+    UserManager --> System : Save confirmation
     deactivate UserManager
 end
 
-== Extension: *a. Periodic account inactivity check ==
+== Расширение: *a. Периодическая проверка неактивности аккаунта ==
 
 System -> Admin : checkInactivity()
 activate Admin
@@ -126,7 +126,7 @@ activate Notifier
 Notifier --> User : Notification of prolonged inactivity
 deactivate Notifier
 
-== Extension: *b. Restore access after system failure ==
+== Расширение: *b. Восстановление доступа после сбоя системы ==
 
 User -> System : Report system failure
 System -> Admin : restart()
