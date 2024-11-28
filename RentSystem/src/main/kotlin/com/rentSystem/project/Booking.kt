@@ -2,8 +2,6 @@ package com.rentSystem.project
 
 import java.util.*
 
-import java.util.*
-
 data class Booking(
     val id: UUID,
     val tenantID: UUID,
