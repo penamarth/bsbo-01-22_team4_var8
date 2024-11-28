@@ -1,154 +1,138 @@
 ```plantuml
 @startuml
 
-actor "Пользователь" as User
-actor "Администратор" as Admin
+actor "User" as User
+actor "Administrator" as Admin
 
 participant "BookingSystem" as System
-participant "User" as Account
+participant "UserManager" as UserManager
 participant "Payment" as Payment
-participant "Notification" as Notifier
+participant "NotificationModule" as Notifier
 
-== Основной Успешный Сценарий ==
+== Main Successful Scenario ==
 
 User -> System : Open account settings
 activate System
 
-System -> Account : loadData(userID)
-activate Account
-Account --> System : account data
-deactivate Account
+System -> UserManager : getUserByID(userID)
+activate UserManager
+UserManager --> System : Account data
+deactivate UserManager
 
-System --> User : display account data
+System --> User : Display account data
 
 User -> System : Change contact information
-System -> Account : validateData(data)
-activate Account
-Account --> System : validation result
-deactivate Account
+System -> UserManager : validateData(data) <<Manual Validation>> 
+alt Data is valid
+    System -> UserManager : addUser(userID, data)
+    activate UserManager
+    UserManager --> System : Success confirmation
+    deactivate UserManager
 
-alt Данные корректны
-    System -> Account : saveChanges(userID, data)
-    activate Account
-    Account --> System : confirmation of save
-    deactivate Account
-
-    System -> Notifier : notifyUser(userID, message)
+    System -> Notifier : notifyObservers(notification)
     activate Notifier
     Notifier --> User : Notification of data change
     deactivate Notifier
-else Некорректные данные
-    System -> Account : showErrors(data)
-    activate Account
-    Account --> System : data errors
-    deactivate Account
-
+else Data is invalid
     System --> User : Message about data errors
 end
 
 User -> System : Change payment information
-System -> Payment : updateDetails(userID, paymentInfo)
+System -> Payment : updateDetails(paymentInfo)
 activate Payment
 Payment --> System : Update confirmation
 deactivate Payment
 
-System -> Notifier : notifyUser(userID, message)
+System -> Notifier : notifyObservers(notification)
 activate Notifier
 Notifier --> User : Notification of payment information change
 deactivate Notifier
 
 User -> System : Delete account
-System -> Account : confirmDeletion(userID)
-activate Account
-Account --> System : deletion confirmation
-deactivate Account
+System -> UserManager : getUserByID(userID)
+activate UserManager
+UserManager --> System : User data for deletion confirmation
+deactivate UserManager
 
-alt Подтверждено
-    System -> Account : delete(userID)
-    activate Account
-    Account --> System : Account deleted
-    deactivate Account
+alt Confirmed
+    System -> UserManager : deleteUser(userID)
+    activate UserManager
+    UserManager --> System : Account deleted confirmation
+    deactivate UserManager
 
-    System -> Notifier : notifyUser(userID, deleteConfirmationMessage)
+    System -> Notifier : notifyObservers(notification)
     activate Notifier
     Notifier --> User : Account deletion notification
     deactivate Notifier
-else Не подтверждено
-    System --> User : account deletion cancelled
+else Not confirmed
+    System --> User : Account deletion cancelled
 end
 
-== Альтернативный Поток: *2.1 Пользователь указывает некорректные данные ==
+== Alternative Flow: *2.1 User enters invalid data ==
 
 User -> System : Enter data with errors
-System -> Account : validateData(data)
-activate Account
-Account --> System : validation error
-deactivate Account
+System -> UserManager : validateData(data)
+alt Validation fails
+    System --> User : Message about data errors
+end
 
-System -> Account : showErrors(data)
-activate Account
-Account --> System : errors
-deactivate Account
-
-System --> User : Message about data errors
-
-== Альтернативный Поток: *3.1 Пользователь запрашивает удаление платежных данных без замены ==
+== Alternative Flow: *3.1 User requests deletion of payment data without replacement ==
 
 User -> System : Delete payment information
 System -> Payment : requireUpdate()
 activate Payment
-Payment --> System : Notification of need for new data
+Payment --> System : Notification of required new data
 deactivate Payment
 
 System --> User : Message about needing to provide new payment information
 
-== Альтернативный Поток: *4.1 Пользователь хочет восстановить учетную запись ==
+== Alternative Flow: *4.1 User tries to restore a deleted account ==
 
 User -> System : Log in after account deletion
-System -> Account : showDeletedMessage()
-activate Account
-Account --> System : Account deleted
-deactivate Account
+System -> UserManager : getUserByID(userID)
+activate UserManager
+UserManager --> System : Account is deleted message
+deactivate UserManager
 
 System --> User : Notification of inability to restore account
 
-== Альтернативный Поток: *5.1 Ошибка при сохранении данных ==
+== Alternative Flow: *5.1 Error during data saving ==
 
 User -> System : Change personal data
-System -> Account : saveChanges(userID, data)
-activate Account
-Account --> System : Data saving error
-deactivate Account
+System -> UserManager : addUser(userID, data)
+activate UserManager
+alt Error occurs
+    UserManager --> System : Error saving data
+    deactivate UserManager
 
-System -> Notifier : notifyError(userID, errorDetails)
-activate Notifier
-Notifier --> User : Error notification with recommendation
-deactivate Notifier
+    System -> Notifier : notifyObservers(errorNotification)
+    activate Notifier
+    Notifier --> User : Error notification with recommendation
+    deactivate Notifier
+else Data saved successfully
+    UserManager --> System : Success confirmation
+    deactivate UserManager
+end
 
-== Расширение: *а. Периодическая проверка активности учетной записи ==
+== Extension: *a. Periodic account inactivity check ==
 
 System -> Admin : checkInactivity()
 activate Admin
 Admin --> System : Report on inactive accounts
 deactivate Admin
 
-System -> User : remindInactivity(userID)
+System -> Notifier : notifyObservers(inactivityNotification)
 activate Notifier
 Notifier --> User : Notification of prolonged inactivity
 deactivate Notifier
 
-== Расширение: *б. Восстановление доступа к учетной записи после сбоя ==
+== Extension: *b. Restore access after system failure ==
 
-User -> System : Report failure
+User -> System : Report system failure
 System -> Admin : restart()
 activate Admin
-Admin --> System : System restoration
+Admin --> System : System restored
 deactivate Admin
-
-System -> Account : restoreSession(userID)
-activate Account
-Account --> System : session restored
-deactivate Account
 
 System --> User : Return to last action
 
