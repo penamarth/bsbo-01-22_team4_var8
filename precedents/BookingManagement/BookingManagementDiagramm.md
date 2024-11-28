@@ -3,45 +3,57 @@
 @startuml
 actor Квартиросъёмщик
 actor Владелец
-participant "BookingSystem" as System
+participant "BookingSystemFacade" as System
+participant "BookingManager" as BookingManager
 participant "Booking" as Booking
-participant "Notification" as NotificationService
+participant "NotificationModule" as NotificationModule
 
 == Просмотр текущего бронирования ==
 Квартиросъёмщик -> System: Navigate to booking management
-System -> Booking: getBookingStatus(bookingID)
-Booking -> System: Booking status
+System -> BookingManager: getBookingByID(bookingID)
+BookingManager -> Booking: getStatus()
+Booking -> BookingManager: Return booking status
+BookingManager -> System: Booking status
 System -> Квартиросъёмщик: Display booking status
 
 == Изменение или отмена бронирования ==
 Квартиросъёмщик -> System: Modify/cancel booking
-System -> Booking: modifyBooking(bookingID, data)
-Booking -> System: Confirmation of changes
-System -> Владелец: Notification of changes (notifyUsers)
+System -> BookingManager: getBookingByID(bookingID)
+BookingManager -> Booking: modify() or cancel()
+Booking -> BookingManager: Confirmation of changes
+BookingManager -> System: Confirmation of changes
+System -> Владелец: Notification of changes (notifyObservers)
 
 == Подтверждение бронирования владельцем ==
 Владелец -> System: Confirm booking
-System -> Booking: confirmBooking(bookingID)
-Booking -> System: Confirmation
-System -> Квартиросъёмщик: Confirmation notification (notifyUsers)
+System -> BookingManager: getBookingByID(bookingID)
+BookingManager -> Booking: confirm()
+Booking -> BookingManager: Confirmation
+BookingManager -> System: Confirmation
+System -> Квартиросъёмщик: Confirmation notification (notifyObservers)
 
 == Отклонение бронирования владельцем ==
 Владелец -> System: Reject booking
-System -> Booking: rejectBooking(bookingID, reason)
-Booking -> System: Confirmation
-System -> Квартиросъёмщик: Rejection notification (notifyUsers)
+System -> BookingManager: getBookingByID(bookingID)
+BookingManager -> Booking: reject()
+Booking -> BookingManager: Confirmation
+BookingManager -> System: Rejection confirmation
+System -> Квартиросъёмщик: Rejection notification (notifyObservers)
 
 == Продление бронирования ==
 Квартиросъёмщик -> System: Request extension
-System -> Booking: extendBooking(bookingID, duration)
-Booking -> System: Extension confirmation
-System -> Владелец: Extension notification (notifyUsers)
+System -> BookingManager: getBookingByID(bookingID)
+BookingManager -> Booking: extend()
+Booking -> BookingManager: Extension confirmation
+BookingManager -> System: Extension confirmation
+System -> Владелец: Extension notification (notifyObservers)
 
 == Уведомление участников ==
-System -> NotificationService: notifyUsers(bookingID, message)
-NotificationService -> Квартиросъёмщик: Notification
-NotificationService -> Владелец: Notification
+System -> NotificationModule: notifyObservers(notification)
+NotificationModule -> Квартиросъёмщик: Notification
+NotificationModule -> Владелец: Notification
 
 @enduml
+
 
 ```
