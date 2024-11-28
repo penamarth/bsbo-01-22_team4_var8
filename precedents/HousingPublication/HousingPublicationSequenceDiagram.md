@@ -1,4 +1,5 @@
 ```plantuml
+
 @startuml
 
 actor "Владелец недвижимости" as Owner
@@ -7,7 +8,7 @@ actor "Квартиросъёмщик" as Tenant
 
 participant "BookingSystem" as System
 participant "Listing" as Listing
-participant "Notification" as Notifier
+participant "NotificationService" as Notifier
 
 == Основной Успешный Сценарий ==
 
@@ -135,4 +136,5 @@ Notifier --> Owner : Confirmation of changes on mobile device
 deactivate Notifier
 
 @enduml
+
 ```
