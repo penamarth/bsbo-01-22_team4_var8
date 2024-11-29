@@ -1,21 +1,13 @@
 ```plantuml
 @startuml
 
-actor Квартиросъёмщик
-participant PropertySearch
-participant Property
-participant Favorites
-participant Booking
-participant NotificationModule
-
-actor "Квартиросъёмщик" as Tenant
-actor "Владелец" as Owner
-
-participant "BookingSystem" as System
-participant "PropertySearch" as Search
-participant "PropertyDetails" as Details
+actor "Съемщик" as Tenant
+participant "BookingSystemFacade" as System
+participant "PropertyManager" as Search
+participant "Property" as Details
 participant "FavoritesModule" as Favorites
-participant "MessageModule" as Messaging
+participant "BookingManager" as Booking
+participant "NotificationModule" as Notification
 
 == Основной Успешный Сценарий ==
 
@@ -45,17 +37,24 @@ activate System
 System -> Favorites : addProperty(propertyID, tenantID)
 activate Favorites
 
-Favorites -> NotificationModule : notifyOwner(propertyID, "added to favorites")
+Favorites -> Notification : notifyOwner(propertyID, "added to favorites")
 deactivate Favorites
-Tenant -> Booking : startBooking(propertyID)
-activate Booking
-Booking -> NotificationModule : notifyOwner(propertyID, "viewed property")
-deactivate Booking
 
 Favorites --> System : confirmation of addition
 deactivate Favorites
 
 System -> Tenant : confirmation of saving to favorites
+
+Tenant -> Booking : startBooking(propertyID)
+activate Booking
+
+Booking -> Notification : notifyOwner(propertyID, "viewed property")
+deactivate Booking
+
+Booking --> System : confirmation of booking start
+deactivate Booking
+
+System -> Tenant : confirmation of booking start
 
 System -> Owner : notifyOwner(ownerID, "Your listing has been added to favorites")
 activate Owner
@@ -64,9 +63,9 @@ deactivate Owner
 
 deactivate System
 
-== Альтернативный Поток: *1.1 Квартиросъёмщик не нашёл подходящего жилья ==
+== Альтернативный Поток: *1.1 Съемщик не нашел подходящего жилья ==
 
-alt Квартиросъёмщик не нашёл подходящего жилья
+alt Съемщик не нашел подходящего жилья
     Tenant -> System : searchProperties(location, priceRange, roomCount, amenities)
     activate System
 
@@ -94,16 +93,16 @@ alt Квартиросъёмщик не нашёл подходящего жил
     deactivate System
 end
 
-== Альтернативный Поток: *3.1 Квартиросъёмщик хочет запросить дополнительную информацию ==
+== Альтернативный Поток: *3.1 Съемщик хочет запросить дополнительную информацию ==
 
-alt Квартиросъёмщик хочет запросить дополнительную информацию
+alt Съемщик хочет запросить дополнительную информацию
     Tenant -> System : sendMessage(propertyID, message)
     activate System
 
-    System -> Messaging : sendMessage(propertyID, tenantID, message)
-    activate Messaging
-    Messaging --> System : confirmation of sending
-    deactivate Messaging
+    System -> Notification : sendMessage(propertyID, tenantID, message)
+    activate Notification
+    Notification --> System : confirmation of sending
+    deactivate Notification
 
     System -> Owner : notifyOwner(ownerID, "Message received from tenant")
     activate Owner
@@ -120,10 +119,10 @@ alt Владелец отвечает на запрос
     Owner -> System : respondToMessage(propertyID, tenantID, response)
     activate System
 
-    System -> Messaging : sendMessageResponse(propertyID, tenantID, response)
-    activate Messaging
-    Messaging --> System : confirmation of sending
-    deactivate Messaging
+    System -> Notification : sendMessageResponse(propertyID, tenantID, response)
+    activate Notification
+    Notification --> System : confirmation of sending
+    deactivate Notification
 
     System -> Tenant : receive owner's response
     deactivate System
