@@ -23,18 +23,24 @@ interface IUserManager {
   +addUser(user: User): UUID
   +getUserByID(userID: UUID): User
   +getAllUsers(): List<User>
+  +updateUser(userID: UUID, updatedUser: User): void
+  +deleteUser(userID: UUID): void
 }
 
 interface IBookingManager {
   +createBooking(booking: Booking): UUID
   +getBookingByID(bookingID: UUID): Booking
   +getBookingsByUser(userID: UUID): List<Booking>
+  +updateBooking(bookingID: UUID, updatedBooking: Booking): void
+  +cancelBooking(bookingID: UUID): void
 }
 
 interface IPropertyManager {
   +addProperty(property: Property): UUID
   +getPropertyByID(propertyID: UUID): Property
   +getPropertiesByOwner(ownerID: UUID): List<Property>
+  +updateProperty(propertyID: UUID, updatedProperty: Property): void
+  +removeProperty(propertyID: UUID): void
 }
 
 ' --- Фасад ---
@@ -42,11 +48,15 @@ class BookingSystemFacade {
   +UserManager: IUserManager
   +BookingManager: IBookingManager
   +PropertyManager: IPropertyManager
-  +NotificationModule: NotificationModule
   +registerUser(data: User): UUID
   +createBooking(data: Booking): UUID
-  +sendNotification(data: Notification): void
   +validateUserData(data: User): Boolean
+  +updateUser(data: User): void
+  +deleteUser(userID: UUID): void
+  +updateProperty(data: Property): void
+  +removeProperty(propertyID: UUID): void
+  +updateBooking(data: Booking): void
+  +cancelBooking(bookingID: UUID): void
 }
 
 ' --- Модули системы ---
@@ -55,6 +65,8 @@ class UserManager implements IUserManager {
   +addUser(user: User): UUID
   +getUserByID(userID: UUID): User
   +getAllUsers(): List<User>
+  +updateUser(userID: UUID, updatedUser: User): void
+  +deleteUser(userID: UUID): void
 }
 
 class BookingManager implements IBookingManager {
@@ -62,6 +74,8 @@ class BookingManager implements IBookingManager {
   +createBooking(booking: Booking): UUID
   +getBookingByID(bookingID: UUID): Booking
   +getBookingsByUser(userID: UUID): List<Booking>
+  +updateBooking(bookingID: UUID, updatedBooking: Booking): void
+  +cancelBooking(bookingID: UUID): void
 }
 
 class PropertyManager implements IPropertyManager {
@@ -69,16 +83,8 @@ class PropertyManager implements IPropertyManager {
   +addProperty(property: Property): UUID
   +getPropertyByID(propertyID: UUID): Property
   +getPropertiesByOwner(ownerID: UUID): List<Property>
-}
-
-class NotificationModule implements Notifier {
-  +Observers: List<Observer>
-  +Notifications: List<Notification>
-  +Messages: List<Message>
-  +sendNotification(notification: Notification): void
-  +subscribe(observer: Observer): void
-  +unsubscribe(observer: Observer): void
-  +notifyObservers(notification: Notification): void
+  +updateProperty(propertyID: UUID, updatedProperty: Property): void
+  +removeProperty(propertyID: UUID): void
 }
 
 ' --- Пользователи ---
@@ -112,7 +118,7 @@ class Administrator {
 }
 
 ' --- Связанные классы ---
-class Property {
+class Property implements Notifier {
   +ID: UUID
   +Address: String
   +Description: String
@@ -121,6 +127,11 @@ class Property {
   +Photos: List<String>
   +Amenities: List<String>
   +AvailabilityStatus: String
+  +Observers: List<Observer>
+  +subscribe(observer: Observer): void
+  +unsubscribe(observer: Observer): void
+  +notifyObservers(notification: Notification): void
+  +updateDetails(updatedProperty: Property): void
 }
 
 class Listing {
@@ -177,13 +188,10 @@ class Message {
 BookingSystemFacade o-- IUserManager
 BookingSystemFacade o-- IBookingManager
 BookingSystemFacade o-- IPropertyManager
-BookingSystemFacade o-- NotificationModule
 
 UserManager o-- User : manages >
 BookingManager o-- Booking : manages >
 PropertyManager o-- Property : manages >
-NotificationModule o-- Notification : manages >
-NotificationModule o-- Message : manages >
 
 User ..|> Observer
 Tenant --|> User
@@ -195,7 +203,7 @@ Property "1" -- "1" Listing : associated with >
 Tenant "1" -- "*" Booking : makes >
 Booking "1" -- "1" Payment : includes >
 Tenant "*" -- "*" Listing : adds to favorites >
-Owner "*" -- "*" Notification : receives >
+Property "*" -- "*" Notification : sends >
 Tenant "*" -- "*" Notification : receives >
 Tenant "*" -- "*" Review : leaves >
 Owner "*" -- "*" Review : receives >
