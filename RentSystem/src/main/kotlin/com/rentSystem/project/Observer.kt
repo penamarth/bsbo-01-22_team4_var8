@@ -2,7 +2,7 @@ package com.rentSystem.project
 
 import java.util.*
 
+// --- Интерфейс Observer ---
 interface Observer {
-    val id: UUID
     fun update(notification: Notification)
 }

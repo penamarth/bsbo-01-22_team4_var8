@@ -3,13 +3,18 @@ package com.rentSystem.project
 import java.util.*
 
 open class User(
-    override val id: UUID,
-    val firstName: String,
-    val lastName: String,
-    val email: String,
-    val phone: String
+    val ID: UUID = UUID.randomUUID(),
+    var FirstName: String,
+    var LastName: String,
+    var Email: String,
+    var Phone: String,
+    var Password: String
 ) : Observer {
     override fun update(notification: Notification) {
-        println("$firstName $lastName получил уведомление: ${notification.messageText}")
+        println("User [$FirstName $LastName] received notification: '${notification.messageText}' at ${notification.sentDate}")
+    }
+
+    override fun toString(): String {
+        return "User(ID=$ID, FirstName='$FirstName', LastName='$LastName', Email='$Email', Phone='$Phone')"
     }
 }

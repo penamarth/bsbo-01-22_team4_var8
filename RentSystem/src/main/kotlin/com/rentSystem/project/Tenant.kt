@@ -3,20 +3,31 @@ package com.rentSystem.project
 import java.util.*
 
 class Tenant(
-    id: UUID,
-    firstName: String,
-    lastName: String,
-    email: String,
-    phone: String
-) : User(id, firstName, lastName, email, phone) {
-    val favoriteListings = mutableListOf<Listing>()
+    ID: UUID = UUID.randomUUID(),
+    FirstName: String,
+    LastName: String,
+    Email: String,
+    Phone: String,
+    Password: String,
+    var RegistrationDate: Date = Date(),
+    var BookingHistory: MutableList<Booking> = mutableListOf(),
+    var FavoriteListings: MutableList<Listing> = mutableListOf()
+) : User(ID, FirstName, LastName, Email, Phone, Password) {
 
-    fun addToFavorites(listing: Listing) {
-        favoriteListings.add(listing)
+    override fun toString(): String {
+        return "Tenant(${super.toString()}, RegistrationDate=$RegistrationDate, BookingHistory=${BookingHistory.size}, FavoriteListings=${FavoriteListings.size})"
     }
 
-    fun leaveReview(review: Review) {
-        println("Отзыв оставлен: ${review.comment}")
+    // Пример метода добавления бронирования
+    fun addBooking(booking: Booking) {
+        BookingHistory.add(booking)
+        println("Booking added to Tenant [$FirstName $LastName]: $booking")
+    }
+
+    // Пример метода добавления объявления в избранное
+    fun addFavoriteListing(listing: Listing) {
+        FavoriteListings.add(listing)
+        println("Listing added to favorites for Tenant [$FirstName $LastName]: $listing")
     }
 }
 

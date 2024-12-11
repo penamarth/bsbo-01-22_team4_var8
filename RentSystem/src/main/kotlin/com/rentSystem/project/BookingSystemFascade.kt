@@ -2,35 +2,101 @@ package com.rentSystem.project
 
 import java.util.*
 
+// --- Фасад ---
+// --- BookingSystemFacade ---
 class BookingSystemFacade(
-    private val userManager: UserManager,
-    private val bookingManager: BookingManager,
-    private val propertyManager: PropertyManager,
-    private val notificationModule: NotificationModule
+    private val userManager: IUserManager,
+    private val bookingManager: IBookingManager,
+    private val propertyManager: IPropertyManager
 ) {
-    fun registerOwner(owner: Owner) {
-        userManager.addUser(owner)
-        notificationModule.subscribe(owner, "Бронирование")
-        notificationModule.subscribe(owner, "Отзыв")
-        println("Владелец ${owner.firstName} ${owner.lastName} зарегистрирован и подписан на уведомления.")
+    // Добавление пользователя
+    fun addUser(user: User): UUID {
+        println("Facade: Adding user $user")
+        return userManager.addUser(user)
     }
 
-    fun registerTenant(tenant: Tenant) {
-        userManager.addUser(tenant)
-        notificationModule.subscribe(tenant, "Оплата")
-        println("Арендатор ${tenant.firstName} ${tenant.lastName} зарегистрирован и подписан на уведомления.")
+    // Получение пользователя по ID
+    fun getUserByID(userID: UUID): User {
+        println("Facade: Getting user by ID $userID")
+        return userManager.getUserByID(userID)
     }
 
-    fun createBooking(booking: Booking) {
-        bookingManager.addBooking(booking)
+    // Получение всех пользователей
+    fun getAllUsers(): List<User> {
+        println("Facade: Getting all users")
+        return userManager.getAllUsers()
+    }
 
-        val notification = Notification(
-            id = UUID.randomUUID(),
-            messageText = "Новое бронирование для вашей недвижимости: ${booking.property.address}",
-            sentDate = Date(),
-            notificationType = "Бронирование"
-        )
-        notificationModule.notifyObservers(notification)
+    // Обновление пользователя
+    fun updateUser(userID: UUID, updatedUser: User) {
+        println("Facade: Updating user with ID $userID")
+        userManager.updateUser(userID, updatedUser)
+    }
+
+    // Удаление пользователя
+    fun deleteUser(userID: UUID) {
+        println("Facade: Deleting user with ID $userID")
+        userManager.deleteUser(userID)
+    }
+
+    // Добавление недвижимости
+    fun addProperty(property: Property): UUID {
+        println("Facade: Adding property $property")
+        return propertyManager.addProperty(property)
+    }
+
+    // Получение недвижимости по ID
+    fun getPropertyByID(propertyID: UUID): Property {
+        println("Facade: Getting property by ID $propertyID")
+        return propertyManager.getPropertyByID(propertyID)
+    }
+
+    // Получение недвижимости по владельцу
+    fun getPropertiesByOwner(ownerID: UUID): List<Property> {
+        println("Facade: Getting properties by owner ID $ownerID")
+        return propertyManager.getPropertiesByOwner(ownerID)
+    }
+
+    // Обновление недвижимости
+    fun updateProperty(propertyID: UUID, updatedProperty: Property) {
+        println("Facade: Updating property with ID $propertyID")
+        propertyManager.updateProperty(propertyID, updatedProperty)
+    }
+
+    // Удаление недвижимости
+    fun removeProperty(propertyID: UUID) {
+        println("Facade: Removing property with ID $propertyID")
+        propertyManager.removeProperty(propertyID)
+    }
+
+    // Создание бронирования
+    fun createBooking(booking: Booking): UUID {
+        println("Facade: Creating booking $booking")
+        return bookingManager.createBooking(booking)
+    }
+
+    // Получение бронирования по ID
+    fun getBookingByID(bookingID: UUID): Booking {
+        println("Facade: Getting booking by ID $bookingID")
+        return bookingManager.getBookingByID(bookingID)
+    }
+
+    // Получение бронирований пользователя
+    fun getBookingsByUser(userID: UUID): List<Booking> {
+        println("Facade: Getting bookings for user ID $userID")
+        return bookingManager.getBookingsByUser(userID)
+    }
+
+    // Обновление бронирования
+    fun updateBooking(bookingID: UUID, updatedBooking: Booking) {
+        println("Facade: Updating booking with ID $bookingID")
+        bookingManager.updateBooking(bookingID, updatedBooking)
+    }
+
+    // Отмена бронирования
+    fun cancelBooking(bookingID: UUID) {
+        println("Facade: Cancelling booking with ID $bookingID")
+        bookingManager.cancelBooking(bookingID)
     }
 }
 

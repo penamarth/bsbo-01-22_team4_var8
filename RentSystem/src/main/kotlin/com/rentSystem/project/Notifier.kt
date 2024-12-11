@@ -1,8 +1,9 @@
 package com.rentSystem.project
 
+// --- Интерфейс Notifier ---
 interface Notifier {
-    fun subscribe(observer: Observer, notificationType: String)
-    fun unsubscribe(observer: Observer, notificationType: String)
+    fun subscribe(observer: Observer)
+    fun unsubscribe(observer: Observer)
     fun notifyObservers(notification: Notification)
 }
 

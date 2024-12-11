@@ -3,8 +3,8 @@ package com.rentSystem.project
 import java.util.*
 
 data class Notification(
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
     val messageText: String,
-    val sentDate: Date,
-    val notificationType: String // Тип уведомления: "Бронирование", "Оплата", "Отзыв" и т.д.
+    val sentDate: Date = Date(),
+    val notificationType: String
 )

@@ -4,7 +4,8 @@ import java.util.*
 
 interface IBookingManager {
     fun createBooking(booking: Booking): UUID
-    fun getBookingByID(bookingID: UUID): Booking?
+    fun getBookingByID(bookingID: UUID): Booking
     fun getBookingsByUser(userID: UUID): List<Booking>
-    fun addBooking(booking: Booking): UUID
+    fun updateBooking(bookingID: UUID, updatedBooking: Booking)
+    fun cancelBooking(bookingID: UUID)
 }
