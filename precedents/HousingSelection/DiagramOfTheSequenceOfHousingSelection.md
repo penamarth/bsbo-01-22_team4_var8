@@ -1,130 +1,107 @@
 ```plantuml
 @startuml
 
-actor "Съемщик" as Tenant
+actor "Квартиросъёмщик" as Tenant
 participant "BookingSystemFacade" as System
-participant "PropertyManager" as Search
-participant "Property" as Details
-participant "FavoritesModule" as Favorites
-participant "BookingManager" as Booking
-participant "NotificationModule" as Notification
+participant "PropertyManager" as PropertyMgr
+participant "BookingManager" as BookingMgr
+participant "UserManager" as UserMgr
+participant "Notification" as Notification
+participant "Owner" as Owner
 
 == Основной Успешный Сценарий ==
 
-Tenant -> System : searchProperties(location, priceRange, roomCount, amenities)
+Tenant -> System : Request a list of objects
 activate System
 
-System -> Search : filterResults(location, priceRange, roomCount, amenities)
-activate Search
-Search --> System : list of available properties
-deactivate Search
+System -> PropertyMgr : getPropertiesByOwner(ownerID)
+activate PropertyMgr
+PropertyMgr --> System : List of real estate objects
+deactivate PropertyMgr
 
-System -> Tenant : display search results
+System -> Tenant : Displaying a list of objects
 
-Tenant -> System : viewPropertyDetails(propertyID)
+Tenant -> System : Select an object for booking
 activate System
 
-System -> Details : getDetails(propertyID)
-activate Details
-Details --> System : detailed property information
-deactivate Details
+System -> PropertyMgr : getPropertyByID(propertyID)
+activate PropertyMgr
+PropertyMgr --> System : Detailed information about housing
+deactivate PropertyMgr
 
-System -> Tenant : display property details
+System -> Tenant : Displaying housing details
 
-Tenant -> System : addToFavorites(propertyID)
+Tenant -> System : Create a booking
 activate System
 
-System -> Favorites : addProperty(propertyID, tenantID)
-activate Favorites
+System -> BookingMgr : createBooking(booking)
+activate BookingMgr
+BookingMgr --> System : Booking Confirmation
+deactivate BookingMgr
 
-Favorites -> Notification : notifyOwner(propertyID, "added to favorites")
-deactivate Favorites
+System -> Tenant : Booking confirmation
 
-Favorites --> System : confirmation of addition
-deactivate Favorites
+System -> BookingMgr : Initiate Owner Notification
+activate BookingMgr
+BookingMgr -> Notification : Send notification
+activate Notification
+Notification --> Owner : Receiving notification
+deactivate Notification
+deactivate BookingMgr
 
-System -> Tenant : confirmation of saving to favorites
-
-Tenant -> Booking : startBooking(propertyID)
-activate Booking
-
-Booking -> Notification : notifyOwner(propertyID, "viewed property")
-deactivate Booking
-
-Booking --> System : confirmation of booking start
-deactivate Booking
-
-System -> Tenant : confirmation of booking start
-
-System -> Owner : notifyOwner(ownerID, "Your listing has been added to favorites")
-activate Owner
-Owner <-- System : receive notification
-deactivate Owner
+System -> Tenant : Displaying booking confirmation
 
 deactivate System
 
-== Альтернативный Поток: *1.1 Съемщик не нашел подходящего жилья ==
+== Альтернативный Поток: *1.1 Квартиросъёмщик не нашёл подходящего жилья ==
 
-alt Съемщик не нашел подходящего жилья
-    Tenant -> System : searchProperties(location, priceRange, roomCount, amenities)
+alt Квартиросъёмщик не нашёл подходящего жилья
+    Tenant -> System : Request a list of objects
     activate System
 
-    System -> Search : filterResults(location, priceRange, roomCount, amenities)
-    activate Search
-    Search --> System : empty list
-    deactivate Search
+    System -> PropertyMgr : getPropertiesByOwner(ownerID)
+    activate PropertyMgr
+    PropertyMgr --> System : Empty list
+    deactivate PropertyMgr
 
-    System -> Tenant : message "Property not found"
-    
-    Tenant -> System : suggestChangingSearchCriteria()
-    activate System
+    System -> Tenant : message "Housing not found or unavailable"
 
-    System -> Tenant : request new search criteria
-
-    Tenant -> System : searchProperties(newLocation, newPriceRange, newRoomCount, newAmenities)
-    activate System
-
-    System -> Search : filterResults(newLocation, newPriceRange, newRoomCount, newAmenities)
-    activate Search
-    Search --> System : updated list of properties
-    deactivate Search
-
-    System -> Tenant : display updated search results
     deactivate System
 end
 
-== Альтернативный Поток: *3.1 Съемщик хочет запросить дополнительную информацию ==
+== Альтернативный Поток: *2.1 Ошибка при создании бронирования ==
 
-alt Съемщик хочет запросить дополнительную информацию
-    Tenant -> System : sendMessage(propertyID, message)
+alt Ошибка при создании бронирования
+    Tenant -> System : Create a booking
     activate System
 
-    System -> Notification : sendMessage(propertyID, tenantID, message)
-    activate Notification
-    Notification --> System : confirmation of sending
-    deactivate Notification
+    System -> BookingMgr : createBooking(booking)
+    activate BookingMgr
+    BookingMgr --> System : Error creating booking
+    deactivate BookingMgr
 
-    System -> Owner : notifyOwner(ownerID, "Message received from tenant")
-    activate Owner
-    Owner <-- System : receive notification
-    deactivate Owner
-
-    System -> Tenant : confirmation of message sent
+    System -> Tenant : error message "Unable to create reservation. Try again later."
     deactivate System
 end
 
-== Альтернативный Поток: *3.2 Владелец отвечает на запрос ==
+== Альтернативный Поток: *3.1 Отмена бронирования ==
 
-alt Владелец отвечает на запрос
-    Owner -> System : respondToMessage(propertyID, tenantID, response)
+alt Отмена бронирования
+    Tenant -> System : Cancel booking
     activate System
 
-    System -> Notification : sendMessageResponse(propertyID, tenantID, response)
+    System -> BookingMgr : cancelBooking(bookingID)
+    activate BookingMgr
+    BookingMgr --> System : Confirmation of booking cancellation
+    deactivate BookingMgr
+
+    System -> Notification : Send notification to owner
     activate Notification
-    Notification --> System : confirmation of sending
+    Notification --> Owner : Receiving notification
     deactivate Notification
 
-    System -> Tenant : receive owner's response
+    System -> Tenant : Confirmation of booking cancellation
+
     deactivate System
 end
 
