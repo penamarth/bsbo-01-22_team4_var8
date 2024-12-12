@@ -1,3 +1,5 @@
+```plantuml
+
 @startuml
 
 actor "Administrator" as Admin
@@ -45,3 +47,5 @@ System -> BookingManager: cancelBooking()
 deactivate System
 
 @enduml
+
+```
