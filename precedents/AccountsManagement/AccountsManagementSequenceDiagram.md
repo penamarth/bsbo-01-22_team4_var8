@@ -76,13 +76,6 @@ end
 
 deactivate Facade
 
-== Альтернативный сценарий: Отмена удаления учетной записи ==
-
-User -> Facade : Cancel account deletion
-activate Facade
-Facade --> User : Deletion cancelled message
-
-deactivate Facade
 
 @enduml
 ```
