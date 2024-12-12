@@ -1,4 +1,4 @@
-
+```plantuml
 @startuml
 
 actor "Пользователь" as User
@@ -85,3 +85,4 @@ Facade --> User : Deletion cancelled message
 deactivate Facade
 
 @enduml
+```
