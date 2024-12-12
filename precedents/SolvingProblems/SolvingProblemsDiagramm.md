@@ -1,52 +1,48 @@
 ```plantuml
 
 @startuml
-actor Квартиросъёмщик
-actor Владелец
-actor Администратор
+
+actor "Tenant" as Tenant
+actor "Owner" as Owner
+actor "Administrator" as Admin
 participant "BookingSystem" as System
 participant "NotificationModule" as NotificationService
 
-== Создание новой проблемы ==
-Квартиросъёмщик -> System: createIssue(issueID, issueData)
-System -> System: saveNewIssue(issueID, issueData)
-System -> Квартиросъёмщик: confirmIssueCreation()
-System -> NotificationService: notifyUser(ownerID, newIssueNotification)
-NotificationService -> Владелец: notification of new issue
 
-== Добавление комментария к проблеме ==
-Квартиросъёмщик -> System: addComment(issueID, comment)
-System -> System: addCommentToIssue(issueID, comment)
-System -> NotificationService: notifyUser(ownerID, newCommentNotification)
-NotificationService -> Владелец: notification of new comment
-System -> NotificationService: notifyUser(adminID, newCommentNotification) [если необходимо]
-NotificationService -> Администратор: notification of new comment
+Tenant -> System: Search properties
+activate System
+System -> PropertyManager: getPropertiesByOwner()
+deactivate System
 
-== Эскалация проблемы ==
-Квартиросъёмщик -> System: escalateIssue(issueID)
-System -> System: updateIssueStatus(issueID, "Escalated")
-System -> NotificationService: notifyUser(adminID, issueEscalatedNotification)
-NotificationService -> Администратор: notification of issue escalation
-System -> NotificationService: notifyUser(tenantID, issueStatusUpdated("Escalated"))
-NotificationService -> Квартиросъёмщик: notification of issue status updated
+Tenant -> System: Book property
+activate System
+System -> BookingManager: createBooking()
+deactivate System
 
-== Обновление статуса проблемы ==
-Администратор -> System: updateIssueStatus(issueID, newStatus)
-System -> System: updateIssueStatus(issueID, newStatus)
-System -> NotificationService: notifyUser(tenantID, issueStatusUpdated(newStatus))
-NotificationService -> Квартиросъёмщик: notification of issue status updated
-System -> NotificationService: notifyUser(ownerID, issueStatusUpdated(newStatus))
-NotificationService -> Владелец: notification of issue status updated
+Owner -> System: Update property details
+activate System
+System -> PropertyManager: updateProperty()
+deactivate System
 
-== Закрытие проблемы ==
-Квартиросъёмщик -> System: closeIssue(issueID)
-System -> System: updateIssueStatus(issueID, "Closed")
-System -> NotificationService: notifyUser(adminID, issueClosedNotification)
-NotificationService -> Администратор: notification of issue closure
-System -> NotificationService: notifyUser(tenantID, issueStatusUpdated("Closed"))
-NotificationService -> Квартиросъёмщик: notification of issue status updated
-System -> NotificationService: notifyUser(ownerID, issueClosedNotification)
-NotificationService -> Владелец: notification of issue closure
+Admin -> System: Manage users
+activate System
+System -> UserManager: addUser() or updateUser()
+deactivate System
+
+Admin -> NotificationService: Send notifications
+activate NotificationService
+NotificationService -> Property: notifyObservers()
+deactivate NotificationService
+
+Tenant -> System: Cancel booking
+activate System
+System -> BookingManager: cancelBooking()
+deactivate System
+
+Owner -> System: Add new property
+activate System
+System -> PropertyManager: addProperty()
+deactivate System
 
 @enduml
 
