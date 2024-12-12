@@ -1,55 +1,47 @@
-```plantuml
 @startuml
 
-actor "Администратор" as Administrator
+actor "Administrator" as Admin
 participant "BookingSystemFacade" as System
 
-== Доступ к модулю администрирования ==
-Administrator -> System : loginToAdminInterface()
+
+Admin -> System: Register user
 activate System
-System -> System : verifyAdminAccess(adminId)
-System -> Administrator : displayAdminDashboard()
+System -> UserManager: addUser()
 deactivate System
 
-== Управление пользователями ==
-Administrator -> System : manageUsers()
+Admin -> System: Create booking
 activate System
-System -> System : fetchUserList()
-System -> Administrator : displayUsers()
-Administrator -> System : modifyUser(userId, newRole)
-System -> System : updateUserRole(userId, newRole)
-System -> Administrator : confirmUpdate()
+System -> BookingManager: createBooking()
+deactivate System
 
-== Модерация контента ==
-Administrator -> System : moderateContent()
+Admin -> System: Update user data
 activate System
-System -> System : fetchContentList()
-System -> Administrator : displayContent()
-Administrator -> System : reviewContent(contentId)
-System -> System : updateContentStatus(contentId, status, comments)
-System -> Administrator : confirmContentUpdate()
-System -> Administrator : notifyContentAuthor(contentId)
+System -> UserManager: updateUser()
+deactivate System
 
-== Управление безопасностью ==
-Administrator -> System : accessSecuritySettings()
+Admin -> System: Delete user
 activate System
-System -> System : retrieveLogs()
-System -> Administrator : displayLogs()
-Administrator -> System : updateSecuritySettings(securityParams)
-System -> System : updateSecurity(securityParams)
-System -> Administrator : confirmSecurityUpdate()
+System -> UserManager: deleteUser()
+deactivate System
 
-== Управление системными настройками ==
-Administrator -> System : accessSystemSettings()
+Admin -> System: Update property information
 activate System
-System -> System : fetchSettings()
-System -> Administrator : displaySettings()
-Administrator -> System : modifySettings(newSettings)
-System -> System : updateSettings(newSettings)
-System -> Administrator : confirmSettingsUpdate()
-System -> Administrator : notifySettingsUpdated()
+System -> PropertyManager: updateProperty()
+deactivate System
 
+Admin -> System: Remove property
+activate System
+System -> PropertyManager: removeProperty()
+deactivate System
+
+Admin -> System: Update booking
+activate System
+System -> BookingManager: updateBooking()
+deactivate System
+
+Admin -> System: Cancel booking
+activate System
+System -> BookingManager: cancelBooking()
 deactivate System
 
 @enduml
-```
