@@ -10,7 +10,7 @@ class BookingSystemFacade(
     private val propertyManager: IPropertyManager
 ) {
     // Добавление пользователя
-    fun addUser(user: User): UUID {
+    fun addUser(user: UserData): UUID {
         println("Facade: Adding user $user")
         return userManager.addUser(user)
     }

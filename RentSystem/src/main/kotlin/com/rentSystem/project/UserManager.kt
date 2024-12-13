@@ -5,7 +5,14 @@ import java.util.*
 class UserManager : IUserManager {
     private val users: MutableList<User> = mutableListOf()
 
-    override fun addUser(user: User): UUID {
+    override fun addUser(user_new: UserData): UUID {
+        val user = User(
+            FirstName = user_new.FirstName,
+            LastName = user_new.LastName,
+            Email = user_new.Email,
+            Phone = user_new.Phone,
+            Password = user_new.Password
+        )
         users.add(user)
         println("User added: $user")
         return user.ID

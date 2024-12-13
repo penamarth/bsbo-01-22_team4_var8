@@ -3,9 +3,9 @@ package com.rentSystem.project
 import java.util.*
 
 // --- Класс Property ---
-data class Property(
+class Property(
     val ID: UUID = UUID.randomUUID(),
-    var ownerId: UUID?, // Добавлено свойство ownerId
+    var ownerId: UUID?,
     var Address: String,
     var Description: String,
     var Price: Double,

@@ -2,8 +2,8 @@ package com.rentSystem.project
 
 import java.util.*
 
-data class Payment(
-    val ID: UUID = UUID.randomUUID(),
+class Payment(
+    val ID: UUID,
     var PaymentDate: Date = Date(),
     var Amount: Double,
     var PaymentMethod: String,

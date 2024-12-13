@@ -2,7 +2,7 @@ package com.rentSystem.project
 
 import java.util.*
 
-class Listing(
+data class ListingData(
     val ID: UUID = UUID.randomUUID(),
     var Description: String,
     var Price: Double,
@@ -10,8 +10,4 @@ class Listing(
     var RentalTerms: String,
     var PublicationDate: Date = Date(),
     var Status: String
-) {
-    override fun toString(): String {
-        return "Listing(ID=$ID, Description='$Description', Price=$Price, Status='$Status')"
-    }
-}
+)

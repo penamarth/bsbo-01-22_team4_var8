@@ -3,8 +3,8 @@ package com.rentSystem.project
 import java.util.*
 
 // --- Класс Booking ---
-data class Booking(
-    val ID: UUID = UUID.randomUUID(),
+class Booking(
+    val ID: UUID,
     var StartDate: Date,
     var EndDate: Date,
     var Status: String,

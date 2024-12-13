@@ -12,77 +12,70 @@ fun main() {
     // Инициализация фасада
     val facade = BookingSystemFacade(userManager, bookingManager, propertyManager)
 
-    // Хранение данных в словарях
-    val usersData: Map<String, User> = mapOf(
-        "tenant1" to Tenant(
-            FirstName = "Иван",
-            LastName = "Иванов",
-            Email = "ivan.ivanov@example.com",
-            Phone = "+1234567890",
-            Password = "password123"
-        ),
-        "owner1" to Owner(
-            FirstName = "Мария",
-            LastName = "Петрова",
-            Email = "maria.petrova@example.com",
-            Phone = "+0987654321",
-            Password = "securePass"
-        ),
-        "admin1" to Administrator(
-            FirstName = "Алексей",
-            LastName = "Смирнов",
-            Email = "alexey.smirnov@example.com",
-            Phone = "+1122334455",
-            Password = "adminPass"
+    val tenant1 = TenantData(
+        FirstName = "Иван",
+        LastName = "Иванов",
+        Email = "ivan.ivanov@example.com",
+        Phone = "+1234567890",
+        Password = "password123"
+    )
+    val owner1 = OwnerData(
+        FirstName = "Иван",
+        LastName = "Иванов",
+        Email = "ivan.ivanov@example.com",
+        Phone = "+1234567890",
+        Password = "password123"
+    )
+    val admin1 = AdministratorData(
+        FirstName = "Алексей",
+        LastName = "Смирнов",
+        Email = "alexey.smirnov@example.com",
+        Phone = "+1122334455",
+        Password = "adminPass"
+    )
+
+    val property1 = PropertyData(
+        ownerId = null,
+        Address = "ул. Ленина, д.1",
+        Description = "Уютная квартира в центре города",
+        Price = 50000.0,
+        NumberOfRooms = 3,
+        Photos = mutableListOf("photo1.jpg", "photo2.jpg"),
+        Amenities = mutableListOf("WiFi", "Кондиционер"),
+        AvailabilityStatus = "Available"
+    )
+    val property2 = PropertyData(
+        ownerId = null,
+        Address = "пр. Мира, д.5",
+        Description = "Современный офисный комплекс",
+        Price = 150000.0,
+        NumberOfRooms = 10,
+        Photos = mutableListOf("photo3.jpg", "photo4.jpg"),
+        Amenities = mutableListOf("WiFi", "Парковка"),
+        AvailabilityStatus = "Available"
+    )
+    val booking1 = BookingData(
+        StartDate = Date(),
+        EndDate = Date(System.currentTimeMillis() + 86400000), // +1 день
+        Status = "Confirmed",
+        PaymentAmount = 1500.0,
+        Payment = PaymentData(
+            Amount = 1500.0,
+            PaymentMethod = "Credit Card",
+            Status = "Completed"
         )
     )
 
-    val propertiesData: Map<String, Property> = mapOf(
-        "property1" to Property(
-            ownerId = null,
-            Address = "ул. Ленина, д.1",
-            Description = "Уютная квартира в центре города",
-            Price = 50000.0,
-            NumberOfRooms = 3,
-            Photos = mutableListOf("photo1.jpg", "photo2.jpg"),
-            Amenities = mutableListOf("WiFi", "Кондиционер"),
-            AvailabilityStatus = "Available"
-        ),
-        "property2" to Property(
-            ownerId = null,
-            Address = "пр. Мира, д.5",
-            Description = "Современный офисный комплекс",
-            Price = 150000.0,
-            NumberOfRooms = 10,
-            Photos = mutableListOf("photo3.jpg", "photo4.jpg"),
-            Amenities = mutableListOf("WiFi", "Парковка"),
-            AvailabilityStatus = "Available"
-        )
-    )
-
-    val bookingsData: Map<String, Booking> = mapOf(
-        "booking1" to Booking(
-            StartDate = Date(),
-            EndDate = Date(System.currentTimeMillis() + 86400000), // +1 день
-            Status = "Confirmed",
-            PaymentAmount = 1500.0,
-            Payment = Payment(
-                Amount = 1500.0,
-                PaymentMethod = "Credit Card",
-                Status = "Completed"
-            )
-        )
-    )
 
     // Добавление пользователей через фасад
     println("\n--- Добавление Пользователей через Фасад ---")
-    val tenantID = facade.addUser(usersData["tenant1"]!!)
-    val ownerID = facade.addUser(usersData["owner1"]!!)
-    val adminID = facade.addUser(usersData["admin1"]!!)
+    val tenantID = facade.addUser(tenant1)
+    val ownerID = facade.addUser(owner1)
+    val adminID = facade.addUser(admin1)
 
     // Добавление свойств через фасад
     println("\n--- Добавление Свойств через Фасад ---")
-    val propertyID1 = facade.addProperty(propertiesData["property1"]!!.apply { ownerId=ownerID })
+    val propertyID1 = facade.addProperty(property1)
     val propertyID2 = facade.addProperty(propertiesData["property2"]!!.apply { ownerId=ownerID })
 
     // Получение всех пользователей
@@ -120,7 +113,7 @@ fun main() {
         userId = tenantID
         propertyId = propertyID2
     }
-    val bookingID1 = facade.createBooking(booking)
+    facade.createBooking(booking)
 
     // Добавление бронирования к арендатору
     println("\n--- Добавление Бронирования к Арендатору ---")
