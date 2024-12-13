@@ -35,20 +35,28 @@
 ## Основной успешный сценарий:
 
 1. **Создание бронирования:**
-    - Квартиросъёмщик инициирует создание бронирования.
-    - Система вызывает метод `BookingManager.createBooking(tenantID, propertyID, dates)`.
-    - Бронирование сохраняется в системе.
+    - Квартиросъёмщик инициирует создание бронирования через интерфейс.
+    - Система через `BookingSystemFacade` вызывает метод `UserManager.getUser(tenantID)` для проверки данных пользователя.
+    - Затем `BookingSystemFacade` вызывает метод `BookingManager.createBooking(tenantID, propertyID, dates)`.
+    - Внутри `BookingManager` вызывается метод `Booking.formRentalAgreement(tenantID, propertyID, dates)` для формирования договора аренды.
+    - После успешного сохранения, `BookingManager` возвращает идентификатор бронирования в `BookingSystemFacade`.
+    - Система уведомляет участников через `Notification.notifyObservers(bookingCreatedNotification)`.
     - Квартиросъёмщик получает подтверждение о создании бронирования.
 
 2. **Подтверждение бронирования владельцем:**
-    - Владелец получает информацию о новом бронировании.
-    - Система вызывает метод `BookingManager.updateBooking(bookingID, "Confirmed")` для подтверждения.
-    - Система обновляет статус бронирования и уведомляет участников.
+    - Владелец получает уведомление о новом бронировании.
+    - Через интерфейс владелец инициирует подтверждение бронирования.
+    - Система через `BookingSystemFacade` вызывает метод `BookingManager.updateBooking(bookingID, updatedBooking)`.
+    - Система обновляет статус бронирования на "Confirmed".
+    - Уведомления о подтверждении бронирования отправляются через `Notification.notifyObservers(bookingConfirmedNotification)`.
+    - Квартиросъёмщик получает уведомление о подтверждении бронирования.
 
 3. **Отмена бронирования:**
-    - Квартиросъёмщик инициирует отмену бронирования.
-    - Система вызывает метод `BookingManager.cancelBooking(bookingID)`.
-    - Бронирование помечается как отменённое, и участники уведомляются.
+    - Квартиросъёмщик инициирует отмену бронирования через интерфейс.
+    - Система через `BookingSystemFacade` вызывает метод `BookingManager.cancelBooking(bookingID)`.
+    - Статус бронирования обновляется на "Cancelled".
+    - Уведомления о статусе отмены отправляются через `Notification.notifyObservers(bookingCancelledNotification)`.
+    - Квартиросъёмщик и владелец получают уведомления об отмене.
 
 ---
 
