@@ -127,11 +127,15 @@ class Property implements Notifier {
   +Photos: List<String>
   +Amenities: List<String>
   +AvailabilityStatus: String
+  +Bookings: List<Booking>
   +Observers: List<Observer>
+  --
+  +addBooking(booking: Booking): void
+  +removeBooking(bookingId: UUID): void
+  +updateDetails(updatedProperty: Property): void
   +subscribe(observer: Observer): void
   +unsubscribe(observer: Observer): void
   +notifyObservers(notification: Notification): void
-  +updateDetails(updatedProperty: Property): void
 }
 
 class Listing {
@@ -150,7 +154,9 @@ class Booking {
   +EndDate: Date
   +Status: String
   +PaymentAmount: Decimal
-  +Payment: Payment
+  +Property: Property
+  --
+  +setProperty(property: Property): void
   +formRentalAgreement(): Agreement
 }
 
@@ -201,6 +207,8 @@ Administrator --|> User
 Owner "1" -- "*" Property : owns >
 Property "1" -- "1" Listing : associated with >
 Tenant "1" -- "*" Booking : makes >
+Booking "1" -- "1" Property : refers to >
+Property "1" -- "*" Booking : linked to >
 Booking "1" -- "1" Payment : includes >
 Tenant "*" -- "*" Listing : adds to favorites >
 Property "*" -- "*" Notification : sends >
